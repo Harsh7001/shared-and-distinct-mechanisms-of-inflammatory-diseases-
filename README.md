@@ -48,10 +48,7 @@ Initial steps
 
     Performed some standard analyses (e.g., differential expression) 
 
-    1. Deseq2 - did not work since our dataset contains normalized counts and Deseq2 requires raw counts. 
-
-    2. limma -  
-
+ 
     Compare results to those published in the original studies 
 
     Then move on to apply dimensionality reduction 
@@ -62,11 +59,8 @@ Initial steps
 
     Compare modules across datasets 
 
-    ICA - 
-
-    EdgeR  
-
- 
+Check the progress through the link below:
+ https://www.notion.so/Investigating-shared-and-distinct-mechanisms-of-inflammatory-diseases-c3732b32ca014130a8e9a275ccabbbc5?pvs=4
 
  
 
