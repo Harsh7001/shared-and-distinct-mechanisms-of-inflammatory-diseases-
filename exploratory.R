@@ -20,10 +20,4 @@ BiocManager::install("biomaRt")
 # Install missing dependencies
 install.packages("biomaRt")
 
-# Retry installing ReducedExperiment package from GitHub
-devtools::install_github("jackgisby/ReducedExperiment")
-data$tissue
-library(ReducedExperiment)
 
-
-a <- ReducedExperiment(se)

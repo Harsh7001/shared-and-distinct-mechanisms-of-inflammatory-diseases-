@@ -22,7 +22,7 @@ stability_resIBD <- estimate_stability(
   mean_stability_threshold=0.85
 )
 
-plot_stability(stability_resIBD, plot_path = "stability.png")
+plot_stability(stability_resIBD, plot_path = "stabilityIBD.png")
 
 IBD_fe <- estimate_factors(
   IBDdata, 
@@ -60,10 +60,10 @@ associations_feIBD <- associate_components(IBD_fe, method = "lm", formula = f1)
 levels(IBD_me$individual_id)
 
 
-associations_feIBD$summaries[associations_feIBD$summaries$term == "case_controlCD" ,]
+associations_feIBD$summaries[associations_feIBD$summaries$term == "case_controlUC_I" ,]
 
 ggplot(
-  associations_feIBD$summaries[associations_feIBD$summaries$term == "case_controlCD" ,],
+  associations_feIBD$summaries[associations_feIBD$summaries$term == "case_controlUC_I" ,],
   aes(-log10(adj_pvalue), reorder(component, -log10(adj_pvalue)), fill = estimate)
 ) +
   geom_point(pch = 21, size = 3) +
@@ -71,10 +71,10 @@ ggplot(
   ylab("Factor name (ordered by p-value)") +
   geom_vline(xintercept = -log10(0.05)) +
   scale_fill_gradient2(low = "#3A3A98", high = "#832424")
-##factors that are "upregulated"in PS patients are shown in red, whereas "downregulated" factors are in blue. The vertical line indicates significance (i.e., adjusted p-valuesless than 0.05).
+##factors that are "upregulated"in IBD patients are shown in red, whereas "downregulated" factors are in blue. The vertical line indicates significance (i.e., adjusted p-valuesless than 0.05).
 
 ggplot(
-  associations_meIBD$summaries[associations_meIBD$summaries$term == "case_controlCD" ,],
+  associations_meIBD$summaries[associations_meIBD$summaries$term == "case_controlUC_I" ,],
   aes(-log10(adj_pvalue), reorder(component, -log10(adj_pvalue)), fill = estimate)
 ) +
   geom_point(pch = 21, size = 3) +
@@ -91,7 +91,7 @@ factor_enrichIBD <- runEnrich(IBD_fe, as_dataframe = TRUE)
 module_enrichIBD <- runEnrich(IBD_me, as_dataframe = TRUE)
 
 ggplot(
-  factor_enrich[factor_enrichIBD$component == "factor_17" & factor_enrichIBD$p.adjust < 0.05 ,],
+  factor_enrich[factor_enrichIBD$component == "factor_28" & factor_enrichIBD$p.adjust < 0.05 ,][1:70, ],
   aes(-log10(p.adjust), reorder(substr(ID, 1, 45), -log10(p.adjust)), fill = enrichmentScore)
 ) +
   geom_point(pch = 21, size = 3) +
@@ -101,7 +101,7 @@ ggplot(
   scale_fill_gradient2(low = "#3A3A98", high = "#832424")
 
 ggplot(
-  module_enrich[module_enrichIBD$component == "module_5" & module_enrichIBD$p.adjust < 0.05 ,][1:15, ],
+  module_enrich[module_enrichIBD$component == "module_38" & module_enrichIBD$p.adjust < 0.05 ,][1:35, ],
   aes(-log10(p.adjust), reorder(substr(ID, 1, 45), -log10(p.adjust)))
 ) +
   geom_point(pch = 21, size = 3) +
