@@ -5,15 +5,18 @@ library(fastICA)
 # Assuming your SummarizedExperiment object is named "se"
 
 # Extract count matrix from SummarizedExperiment object
-counts <- assay(IBDdata)
+IBDcounts <- assay(IBDdata)
 
 # Transpose the count matrix if necessary (ICA usually operates on samples as rows)
-counts <- t(counts)
+#IBDcounts <- t(IBDcounts)
 
 # Perform ICA
-ica_result <- fastICA(counts, n.comp = 10)  # Adjust the number of components as needed
+IBD_ica_result <- fastICA(IBDcounts, n.comp = 8)  # Adjust the number of components as needed
 
 # Access the independent components (ICs)
-independent_components <- ica_result$S
+IBD_independent_components <- IBD_ica_result$S
 
 # Optionally, you can visualize the ICs or perform further analysis
+pheatmap(IBD_independent_components, scale = "row", cluster_rows = TRUE)
+
+dim(IBDindependent_components)

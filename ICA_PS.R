@@ -11,7 +11,7 @@ counts <- assay(PSdata)
 #counts <- t(counts)
 
 # Perform ICA
-ica_result <- fastICA(counts, n.comp = 10,alg.typ = "parallel")  # Adjusting the number of components as needed
+ica_result <- fastICA(counts, n.comp = 12)  # Adjusting the number of components as needed
 
 # Access the independent components (ICs)
 independent_components <- ica_result$S
@@ -19,6 +19,6 @@ independent_components <- ica_result$S
 # Optionally, you can visualize the ICs or perform further analysis
 # Example heatmap of the first independent component
 library(pheatmap)
-pheatmap(independent_components, scale = "column", cluster_rows = TRUE)
+pheatmap(independent_components, scale = "row", cluster_rows = TRUE)
 
 dim(independent_components)
