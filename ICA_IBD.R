@@ -22,7 +22,14 @@ library(pheatmap)
 pheatmap(independent_components, scale = "row", cluster_rows = TRUE)
 
 dim(independent_components)
+par(mfcol = c(2,2))
+# Plot original gene expression profiles
+plot(countsIBD[,1], type="l", main="Original Gene 1") 
+plot(countsIBD[,2], type="l", main="Original Gene 2")
 
+# Plot ICA components  
+plot(ica_result$S[,1], type="l", main="ICA Component 1")
+plot(ica_result$S[,2], type="l", main="ICA Component 2")
 #---------------------------------------------------
 # 1: un-mixing two mixed independent uniforms
 #---------------------------------------------------
@@ -87,8 +94,6 @@ library(pheatmap)
 library(fastICA)
 library(SummarizedExperiment) 
 
-se <- readRDS("gene_countsIBD.rds")
-countsIBD <- t(assay(se)) 
 
 # Select two genes/features to mix  
 gene1 <- countsIBD[,1]

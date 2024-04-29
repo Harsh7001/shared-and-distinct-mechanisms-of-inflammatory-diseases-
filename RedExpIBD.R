@@ -6,7 +6,7 @@ library(ggplot2)
 
 BiocManager::install("clusterProfiler")
 # Install missing dependencies
-install.packages("biomaRt")
+install.packages("raster")
 
 # Retry installing ReducedExperiment package from GitHub
 devtools::install_github("jackgisby/ReducedExperiment")
@@ -107,3 +107,43 @@ ggplot(
   geom_point(pch = 21, size = 3) +
   xlab("-log10(p-value)") +
   ylab("Pathway name (ordered by p-value)")
+
+
+
+common_fe <- intersect(
+  associations_fePS$summaries[associations_fePS$summaries$term == "case_controlPS", "component"],
+  associations_feIBD$summaries[associations_feIBD$summaries$term == "case_controlUC_I", "component"]  
+)
+
+common_me <- intersect(
+  associations_mePS$summaries[associations_mePS$summaries$term == "case_controlPS", "component"],
+  associations_meIBD$summaries[associations_meIBD$summaries$term == "case_controlUC_I", "component"]
+)
+common_pathways <- intersect(
+  rownames(factor_enrich[factor_enrich$component == "top_factor",]),
+  rownames(factor_enrichIBD[factor_enrichIBD$component == "top_factor",])
+)
+common_genes <- intersect(
+  rownames(loadings(PS_fe)[, "top_factor"]),
+  rownames(loadings(IBD_fe)[, "top_factor"])  
+)
+
+
+library(raster)
+
+library(VennDiagram)
+
+venn.diagram(
+  list(
+    PS = common_fe,
+    IBD = common_fe 
+  ),
+  filename = tempfile(
+    pattern = 'Venn_2set_complex',
+    fileext = '.png'
+  ),
+  category.names = c("PS", "IBD"), 
+  fill = c("blue", "red"),
+  output = TRUE  # Add this to ensure the diagram is saved to the file
+)
+

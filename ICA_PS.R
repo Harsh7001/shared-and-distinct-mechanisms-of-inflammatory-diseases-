@@ -22,7 +22,18 @@ library(pheatmap)
 pheatmap(independent_components, scale = "row", cluster_rows = TRUE)
 
 dim(independent_components)
+dev.new() 
 
+# plot code
+
+par(mfcol = c(2,2))
+# Plot original gene expression profiles
+plot(counts[,1], type="l", main="Original Gene 1") 
+plot(counts[,2], type="l", main="Original Gene 2")
+
+# Plot ICA components  
+plot(ica_result$S[,1], type="l", main="ICA Component 1")
+plot(ica_result$S[,2], type="l", main="ICA Component 2")
 #---------------------------------------------------
 # 1: un-mixing two mixed independent uniforms
 #---------------------------------------------------
