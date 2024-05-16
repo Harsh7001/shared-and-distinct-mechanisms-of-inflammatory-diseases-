@@ -51,7 +51,8 @@ reduced(IBD_me)[1:5, 1:5]
 assignments(IBD_me)[1:5]
 loadings(IBD_me)[1:5]
 
-
+eigengene_IBD <- reduced(IBD_me)
+module_assignment_IBD <- assignments(IBD_me)
 
 colData(IBDdata)
 f <- "~ case_control + sex  + severity "
