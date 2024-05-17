@@ -40,16 +40,18 @@ dim(eigengene_PS)
 #########################
 # Assuming your data is organized as described above
 # Create lists containing your data
-multiData <- list(dataset1 = list(data = t(counts1)), dataset2 = list(data = t(counts2)))
+multiData <- list(dataset1 = list(data = t(IBD_me_matrix)), dataset2 = list(data = t(PS_me_matrix)))
 
 # Create lists containing module assignments for each dataset
-multiColor <- list(dataset1 = t(module_assignment_IBD), dataset2 = t(module_assignment_PS))
+multiColor <- list(dataset1 = module_assignment_IBD, dataset2 = module_assignment_PS)
 
 # Call the modulePreservation function with your data
 modulePreservationResult <- modulePreservation(
   multiData = multiData,
   multiColor = multiColor,
-  nPermutations = # Add other arguments as needed
+  dataIsExpr = TRUE,
+  nPermutations = 1
+  
 )
 
 
@@ -61,7 +63,7 @@ print(dim(multiColor[[1]]))
 print(modulePreservation)
 
 print(dim(counts1))
-print(length(module_assignment_IBD))
+a <- list(module_assignment_IBD)
 print(dim(counts2))
 print(length(module_assignment_PS))
 
