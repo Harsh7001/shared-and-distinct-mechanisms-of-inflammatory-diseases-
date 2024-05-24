@@ -105,7 +105,7 @@ plot(moduleSizes, medianRank,
 
 # Add text labels to the plot
 text(moduleSizes, medianRank, labels = rownames(preservationStats_df), pos = 4, cex = 0.7)
-
+dev.list()
 # Interpretation:
 # Higher Zsummary values (above 10) indicate strong evidence of preservation.
 # Median Rank is another measure where lower values indicate better preservation.
@@ -132,7 +132,12 @@ library(clusterProfiler)
 library(org.Hs.eg.db)
 
 # Example: Perform GO enrichment analysis for a specific module
-module_genes <- multiColor$dataset1[names(multiColor$dataset1) %in% "module_1"]
+# Extract genes belonging to "module_1"
+module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_44"])
+
+# Verify the genes extracted
+print(module_genes)
+
 ego <- enrichGO(gene = module_genes, 
                 OrgDb = org.Hs.eg.db, 
                 keyType = "ENSEMBL", 
@@ -145,6 +150,41 @@ ego <- enrichGO(gene = module_genes,
 head(ego)
 #####################################
 
+# Extract the unique modules
+modules <- unique(multiColor$dataset1)
+
+# Loop through each module to create and plot the network
+for (module in modules) {
+  
+  # Get the genes in the current module
+  module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_44"])
+  
+  # Ensure the gene names are present in the row names of IBD_me_matrix
+  valid_genes <- module_genes[module_genes %in% rownames(IBD_me_matrix)]
+  
+  # Check if valid_genes has at least 2 genes
+  if (length(valid_genes) < 2) {
+    next # Skip if not enough genes to form a network
+  }
+  
+  # Extract the expression data for these genes
+  module_expr_matrix <- IBD_me_matrix[valid_genes, ]
+  
+  # Compute the correlation matrix
+  cor_matrix <- cor(t(module_expr_matrix))
+  
+  # Apply a threshold to create an adjacency matrix
+  threshold <- 0.7
+  adj_matrix <- ifelse(abs(cor_matrix) > threshold, 1, 0)
+  
+  # Convert the adjacency matrix to a graph
+  g <- graph_from_adjacency_matrix(adj_matrix, mode = "undirected", diag = FALSE)
+  
+  # Plot the network
+  plot(g, vertex.label = valid_genes, vertex.size = 5, edge.arrow.size = 0.5, main = paste("Network for", module))
+}
+
+#####################################
 # Example: Visualize a preserved module using igraph
 library(igraph)
 
@@ -156,7 +196,11 @@ gene_network <- IBD_me_matrix[, module_genes]
 
 
 # Extract the module genes
-module_genes <- multiColor$dataset1[names(multiColor$dataset1) %in% "module_1"]
+# Extract genes belonging to "module_1"
+module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_1"])
+
+# Verify the genes extracted
+print(module_genes)
 
 # Compute the correlation matrix
 cor_matrix <- cor(IBD_me_matrix)
@@ -175,7 +219,11 @@ plot(g, vertex.label = colnames(IBD_me_matrix), vertex.size = 5, edge.arrow.size
 
 ###
 # Create a graph object for a specific module
-module_genes <- multiColor$dataset1[names(multiColor$dataset1) %in% "module_1"]
+# Extract genes belonging to "module_1"
+module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_44"])
+
+# Verify the genes extracted
+print(module_genes)
 gene_network <- IBD_me_matrix[, module_genes]
 
 # Convert the gene expression matrix to a graph
