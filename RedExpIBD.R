@@ -57,6 +57,7 @@ module_assignment_IBD <- assignments(IBD_me)
 colData(IBDdata)
 f <- "~ case_control + sex  + severity "
 associations_meIBD <- associate_components(IBD_me, method = "lm", formula = f)
+summaries_IBD<-associations_meIBD$summaries
 associations_feIBD <- associate_components(IBD_fe, method = "lm", formula = f1)
 levels(IBD_me$individual_id)
 

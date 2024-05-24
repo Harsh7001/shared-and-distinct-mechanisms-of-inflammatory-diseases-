@@ -3,12 +3,20 @@
 library(WGCNA)
 BiocManager::install("WGCNA")
 BiocManager::install("org.Hs.eg.db")
+install.packages("gtable")
 
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(ggplot2)
 # plotting and data science packages
 library(tidyverse)
 library(cowplot)
 library(patchwork)
 library(SingleCellExperiment)
+if (!requireNamespace("enrichplot", quietly = TRUE)) {
+  install.packages("enrichplot")
+}
+library(enrichplot)
 
 # network analysis & visualization package:
 library(igraph)
@@ -54,11 +62,6 @@ modulePreservationResult <- modulePreservation(
   quickCor = 0,
   verbose= 50
 )
-
-
-
-print(length(multiColor))
-print(dim(multiColor[[1]]))
 
 # Check the results
 print(modulePreservationResult)
@@ -118,11 +121,11 @@ write.csv(preservationStats_df, file = "module_preservation_stats.csv", row.name
 
 
 # Filter for strongly preserved modules
-strongly_preserved <- preservationStats_df[preservationStats_df$Zsummary.pres > 10, ]
+strongly_preserved <- preservationStats_df[preservationStats_df$Zsummary.pres > 5, ]
 print(strongly_preserved)
 
 # Filter for weakly or non-preserved modules
-weakly_preserved <- preservationStats_df[preservationStats_df$Zsummary.pres < 2, ]
+weakly_preserved <- preservationStats_df[preservationStats_df$Zsummary.pres < 5, ]
 print(weakly_preserved)
 
 
@@ -133,7 +136,7 @@ library(org.Hs.eg.db)
 
 # Example: Perform GO enrichment analysis for a specific module
 # Extract genes belonging to "module_1"
-module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_44"])
+module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_3"])
 
 # Verify the genes extracted
 print(module_genes)
@@ -148,6 +151,15 @@ ego <- enrichGO(gene = module_genes,
 
 # View the GO enrichment results
 head(ego)
+# Compute term similarity matrix
+ego <- pairwise_termsim(ego)
+summary(ego)
+
+barplot(ego, showCategory = 20, title = "GO Enrichment Analysis - Bar Plot")
+dotplot(ego, showCategory = 20, title = "GO Enrichment Analysis - Dot Plot")
+emapplot(ego, showCategory = 50, title = "GO Enrichment Analysis - Enrichment Map")
+cnetplot(ego, categorySize = "pvalue", foldChange = NULL, showCategory = 5, title = "GO Enrichment Analysis - Network Plot")
+
 #####################################
 
 # Extract the unique modules
@@ -157,7 +169,7 @@ modules <- unique(multiColor$dataset1)
 for (module in modules) {
   
   # Get the genes in the current module
-  module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_44"])
+  module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_32"])
   
   # Ensure the gene names are present in the row names of IBD_me_matrix
   valid_genes <- module_genes[module_genes %in% rownames(IBD_me_matrix)]
@@ -184,53 +196,6 @@ for (module in modules) {
   plot(g, vertex.label = valid_genes, vertex.size = 5, edge.arrow.size = 0.5, main = paste("Network for", module))
 }
 
-#####################################
-# Example: Visualize a preserved module using igraph
-library(igraph)
-
-# Create a graph object for a specific module
-module_genes <- multiColor$dataset1[names(multiColor$dataset1) %in% "module_1"]
-gene_network <- IBD_me_matrix[, module_genes]
-
-###
-
-
-# Extract the module genes
-# Extract genes belonging to "module_1"
-module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_1"])
-
-# Verify the genes extracted
-print(module_genes)
-
-# Compute the correlation matrix
-cor_matrix <- cor(IBD_me_matrix)
-
-# Apply a threshold to create an adjacency matrix
-threshold <- 0.7
-adj_matrix <- ifelse(abs(cor_matrix) > threshold, 1, 0)
-
-# Convert the adjacency matrix to a graph
-g <- graph_from_adjacency_matrix(cor_matrix, mode = "undirected", diag = FALSE)
-
-# Plot the network
-plot(g, vertex.label = V(g)$name, vertex.size = 5, edge.arrow.size = 0.5)
-plot(g, vertex.label = colnames(IBD_me_matrix), vertex.size = 5, edge.arrow.size = 0.5)
-
-
-###
-# Create a graph object for a specific module
-# Extract genes belonging to "module_1"
-module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_44"])
-
-# Verify the genes extracted
-print(module_genes)
-gene_network <- IBD_me_matrix[, module_genes]
-
-# Convert the gene expression matrix to a graph
-g <- graph.adjacency(as.matrix(gene_network), mode = "undirected", diag = FALSE)
-
-# Plot the network
-plot(g, vertex.label = V(g)$name, vertex.size = 5, edge.arrow.size = 0.5)
 
 
 
@@ -242,16 +207,9 @@ plot(g, vertex.label = V(g)$name, vertex.size = 5, edge.arrow.size = 0.5)
 
 
 
-# Extract preserved modules based on predefined thresholds
-preserved_modules <- rownames(modulePreservationResult)[modulePreservationResult$preservation & modulePreservationResult$Zsummary > 2]
 
-# Extract genes in preserved modules
-genes <- unlist(genesInModules(ps_modules)[[preserved_modules]])
 
-# Enrichment analysis
-enrichResult <- enrichGO(gene = genes, ...)
 
-# Plot preservation
-plotPreservation(modulePreservationResult)
+
 
 save.image(file='yoursession.RData')
