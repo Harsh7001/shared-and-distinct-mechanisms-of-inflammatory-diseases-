@@ -136,7 +136,7 @@ library(org.Hs.eg.db)
 
 # Example: Perform GO enrichment analysis for a specific module
 # Extract genes belonging to "module_1"
-module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_3"])
+module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_37"])
 
 # Verify the genes extracted
 print(module_genes)
