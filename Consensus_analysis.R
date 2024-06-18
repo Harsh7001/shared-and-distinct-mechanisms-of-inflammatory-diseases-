@@ -183,47 +183,10 @@ moduleColors_PS <- consensusModules$colors[[2]]
 table(moduleColors_IBD, moduleColors_PS)
 
 
-devtools::install_github("jackgisby/ReducedExperiment")
-
-
 ###################
-centrality <- getCentrality(object = multiData)
-###################
-# Example definition of the overlap function
-overlap <- function(m1, m2) {
-  # Assuming m1 and m2 are vectors/matrices and we want to find overlapping elements
-  common_elements <- intersect(m1, m2)
-  print(common_elements)
-  return(common_elements)
-}
 
-# Example usage with your loop
-for (m1 in PS_me_matrix) {
-  for (m2 in IBD_me_matrix) {
-    overlap(m1, m2)
-  }
-}
 
-# Print sample data from PS_me_matrix and IBD_me_matrix
-print(head(PS_me))
-print(head(IBD_me))
-# Define a simple overlap function to find common elements
-overlap <- function(m1, m2) {
-  # Assuming m1 and m2 are vectors/matrices and we want to find overlapping elements
-  common_elements <- intersect(m1, m2)
-  print(common_elements)
-  return(common_elements)
-}
-for (i in 1:nrow(PS_me)) {
-  for (j in 1:nrow(IBD_me)) {
-    overlap(PS_me[i, ], IBD_me[j, ])
-  }
-}
-for (m1 in module_assignment_IBD) {
-  for (m2 in module_assignment_PS) {
-    overlap(m1, m2)
-  }
-}
+
 
 
 ###
@@ -271,30 +234,12 @@ print(dim(MEs2))
 
 
 
-###########
-
-IBD_me
-PS_me
-
-for (m_ibd in moduleNames(IBD_me)) {
-  for (m_ps in moduleNames(PS_me)) {
-    # list of genes in the ibd module
-    module_genes_ibd <- which(module_assignment_IBD == m_ibd)
-    # list of genes in the PS module
-    module_genes_ps <- which(module_assignment_PS == m_ps)
-    # Overlap = number of overlapping genes / size of the smaller module
-    overlap <- sum(module_genes_ibd %in% module_genes_ps) / min(length(module_genes_ibd), length(module_genes_ps))
-    print(overlap)
-  }
-}
-
-
-overlap_matrix # ibd modules on x, ps modules on y
-
-
 #############
 
-overlap_matrix <- matrix(NA, nrow = moduleNames(IBD_me), ncol = moduleNames(PS_me)))
+overlap_matrix <- matrix(NA, nrow = moduleNames(IBD_me), ncol = moduleNames(PS_me))
+overlap_matrix <- matrix(0, nrow = length(moduleNames(IBD_me)), ncol = length(moduleNames(PS_me)))
+rownames(overlap_matrix) <- moduleNames(IBD_me)
+colnames(overlap_matrix) <- moduleNames(PS_me)
 
 for (m_ibd in moduleNames(IBD_me)) {
   for (m_ps in moduleNames(PS_me)) {
@@ -318,11 +263,55 @@ print(overlap_matrix)
 
 
 
+library(ggplot2)
+library(reshape2) # for melt function
+
+overlap_matrix_melted <- melt(overlap_matrix)
+names(overlap_matrix_melted) <- c("IBD_Module", "PS_Module", "Overlap")
+ggplot(overlap_matrix_melted, aes(x = IBD_Module, y = PS_Module, fill = Overlap)) +
+  geom_tile() +
+  scale_fill_gradient(low = "skyblue", high = "red") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(fill = "Overlap Score", title = "Overlap of Genes between IBD and PS Modules")
 
 
 
+# Find the maximum value in the overlap matrix
+max_overlap_value <- max(overlap_matrix, na.rm = TRUE)
+
+# Identify the position of the maximum value
+max_position <- which(overlap_matrix == max_overlap_value, arr.ind = TRUE)
+
+# Get the module names corresponding to the maximum overlap
+highest_overlapping_modules <- data.frame(
+  IBD_Module = rownames(overlap_matrix)[max_position[, 1]],
+  PS_Module = colnames(overlap_matrix)[max_position[, 2]],
+  Overlap_Value = rep(max_overlap_value, nrow(max_position))
+)
+
+# Print the highest overlapping modules and their overlap value
+print(highest_overlapping_modules)
 
 
+# Number of top overlaps you want to retrieve
+top_n = 15  # Change this number based on how many top overlaps you want
+
+# Flatten the matrix to a dataframe and include module names
+overlap_data <- as.data.frame(as.table(overlap_matrix))
+names(overlap_data) <- c("IBD_Module", "PS_Module", "Overlap_Value")
+
+# Filter out NA values if any
+overlap_data <- subset(overlap_data, !is.na(Overlap_Value))
+
+# Sort the data to find the top overlaps
+top_overlaps <- overlap_data[order(-overlap_data$Overlap_Value), ]
+
+# Retrieve the top n overlaps
+top_overlaps <- head(top_overlaps, top_n)
+
+# Print the top overlapping modules
+print(top_overlaps)
 
 
 
