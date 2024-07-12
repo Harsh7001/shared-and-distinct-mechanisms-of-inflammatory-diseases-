@@ -136,7 +136,7 @@ library(org.Hs.eg.db)
 
 # Example: Perform GO enrichment analysis for a specific module
 # Extract genes belonging to "module_1"
-module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_1"])
+module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_7"])
 
 # Verify the genes extracted
 print(module_genes)
@@ -195,7 +195,6 @@ for (module in modules) {
   # Plot the network
   plot(g, vertex.label = valid_genes, vertex.size = 5, edge.arrow.size = 0.5, main = paste("Network for", module))
 }
-
 
 
 
