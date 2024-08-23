@@ -16,51 +16,7 @@ Core project: comparing signatures of IMIDs
 
     Applying dimensionality reduction across datasets to compare IMID signatures 
 
-Potential follow-up work 
 
-    Apply and compare alternative approaches for interpretable dimensionality reduction (e.g., regularised factor analysis, deep learning) 
-
-    Predict disease outcomes (using projected signatures) 
-
-    Compare IMID signatures to signatures of drug response (using CMap/L1000 data) 
-
-    Add functionality to R package for applying dimensionality reduction 
-
- 
-
-Initial steps 
-
-    Reading into relevant methods/concepts (RNA-seq, WGCNA/ICA, etc.) 
-
-    Started with a couple of datasets (Inflammatory bowel disease and Psoriasis) 
-
-    Had a look at the studies linked to the data 
-
-    Performed some exploratory analysis (e.g., PCA) 
-
-    Batch effect correction:  
-
-    1. Combat- It required prerequisite knowledge of batches of data collection, which is only available for partial dataset, therefore, it didn't pan out. 
-
-    2.SVA- It gives us an estimate of batches based on the counts data, but due to normalized counts it seems to bug out and not give accurate results. 
-
-    We concluded to do the analysis without doing batch corrections as most of the data used should have accounted for batches by respective labs. 
-
-    Performed some standard analyses (e.g., differential expression) 
-
- 
-    Compare results to those published in the original studies 
-
-    Then move on to apply dimensionality reduction 
-
-    Started by applying WGCNA – could start with ReducedExperiment package, but worthwhile to understand and/or attempt to apply underlying WGCNA package 
-
-    Attempt to characterise and interpret the resultant modules in each dataset 
-
-    Compare modules across datasets 
-
-Check the progress through the link below:
- https://www.notion.so/Investigating-shared-and-distinct-mechanisms-of-inflammatory-diseases-c3732b32ca014130a8e9a275ccabbbc5?pvs=4
 
  
 
