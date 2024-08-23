@@ -162,40 +162,85 @@ cnetplot(ego, categorySize = "pvalue", foldChange = NULL, showCategory = 5, titl
 
 #####################################
 
-# Extract the unique modules
-modules <- unique(multiColor$dataset1)
-
-# Loop through each module to create and plot the network
-for (module in modules) {
-  
-  # Get the genes in the current module
-  module_genes <- names(multiColor$dataset1[multiColor$dataset1 == "module_32"])
-  
-  # Ensure the gene names are present in the row names of IBD_me_matrix
-  valid_genes <- module_genes[module_genes %in% rownames(IBD_me_matrix)]
-  
-  # Check if valid_genes has at least 2 genes
-  if (length(valid_genes) < 2) {
-    next # Skip if not enough genes to form a network
-  }
-  
-  # Extract the expression data for these genes
-  module_expr_matrix <- IBD_me_matrix[valid_genes, ]
-  
-  # Compute the correlation matrix
-  cor_matrix <- cor(t(module_expr_matrix))
-  
-  # Apply a threshold to create an adjacency matrix
-  threshold <- 0.7
-  adj_matrix <- ifelse(abs(cor_matrix) > threshold, 1, 0)
-  
-  # Convert the adjacency matrix to a graph
-  g <- graph_from_adjacency_matrix(adj_matrix, mode = "undirected", diag = FALSE)
-  
-  # Plot the network
-  plot(g, vertex.label = valid_genes, vertex.size = 5, edge.arrow.size = 0.5, main = paste("Network for", module))
-}
 
 
 
 save.image(file='yoursession.RData')
+
+# Assuming 'IBDdata' is your object and you want to export 'colData@listData'
+metadata <- IBDdata@colData@listData
+# Export metadata to CSV format
+write.csv(metadata, file = "metadata.csv", row.names = FALSE)
+
+
+assay <-assay(IBDdata)
+write.csv(assay, file = "assay.csv", row.names = TRUE)
+
+PS_assay <- assay(PSdata)
+write.csv(PS_assay, file = "PS_assay.csv", row.names = TRUE)
+
+
+# Assuming 'IBDdata' is your object and you want to export 'colData@listData'
+PS_metadata <- PSdata@colData@listData
+PS_metadata <- as.data.frame(PS_metadata)
+# Export metadata to CSV format
+write.csv(PS_metadata, file = "PS_metadata.csv", row.names = FALSE)
+
+
+assay_ps <- assay(PSdata)
+# PCA for UC vs Control
+
+# Perform PCA
+pca_ps <- prcomp(t(assay_ps), scale. = TRUE, center = TRUE)
+
+# Prepare data for ggplot
+pca_data_ps <- as.data.frame(pca_ps$x)
+pca_data_ps$sample_id <- rownames(pca_data_ps)
+pca_data_ps <- dplyr::left_join(pca_data_ps, PS_metadata, by = c("sample_id" = "sample_id"))
+
+# Plot PCA
+ggplot(pca_data_ps, aes(x = PC1, y = PC2, color = case_control)) +
+  geom_point(size = 5) +
+  labs(title = "PCA of PS Samples (FDR < 0.001)",
+       x = "Principal Component 1",
+       y = "Principal Component 2") +
+  theme_minimal()
+
+# Perform PCA
+pca_ibd <- prcomp(t(assay), scale. = TRUE, center = TRUE)
+
+# Prepare data for ggplot
+pca_data_ibd <- as.data.frame(pca_ibd$x)
+pca_data_ibd$sample_id <- rownames(pca_data_ibd)
+pca_data_ibd <- dplyr::left_join(pca_data_ibd, metadata, by = c("sample_id" = "sample_id"))
+
+# Plot PCA
+ggplot(pca_data_ibd, aes(x = PC1, y = PC2, color = case_control)) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("Control_NonI" = "grey", "CD_NonI" = "blue", "UC_NonI" = "blue", "CD_I" = "red", "UC_I" = "red")) +
+  labs(title = "PCA of IBD Samples (FDR < 0.001)",
+       x = "Principal Component 1",
+       y = "Principal Component 2") +
+  theme_minimal()
+
+# Prepare data for ggplot
+pca_data_ibd <- as.data.frame(pca_ibd$x)
+pca_data_ibd$sample_id <- rownames(pca_data_ibd)
+pca_data_ibd <- dplyr::left_join(pca_data_ibd, metadata, by = c("sample_id" = "sample_id"))
+
+# Create a new label column
+pca_data_ibd$label <- dplyr::case_when(
+  pca_data_ibd$case_control %in% c("CD_NonI", "UC_NonI") ~ "Non_Inflamed",
+  pca_data_ibd$case_control %in% c("CD_I", "UC_I") ~ "Inflamed",
+  pca_data_ibd$case_control == "Control_NonI" ~ "Control"
+)
+
+# Plot PCA with relabeled categories
+ggplot(pca_data_ibd, aes(x = PC1, y = PC2, color = label)) +
+  geom_point(size = 5) +
+  scale_color_manual(values = c("Control" = "grey", "Non_Inflamed" = "blue", "Inflamed" = "red")) +
+  labs(title = "PCA of IBD Samples (FDR < 0.001)",
+       x = "Principal Component 1",
+       y = "Principal Component 2") +
+  theme_minimal()
+

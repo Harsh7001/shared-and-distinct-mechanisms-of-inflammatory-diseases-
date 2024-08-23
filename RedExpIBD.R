@@ -63,6 +63,7 @@ levels(IBD_me$individual_id)
 
 
 associations_feIBD$summaries[associations_feIBD$summaries$term == "case_controlUC_I" ,]
+associations_meIBD$summaries[associations_meIBD$summaries$term == "case_controlUC_I" ,]
 
 ggplot(
   associations_feIBD$summaries[associations_feIBD$summaries$term == "case_controlUC_I" ,],
@@ -76,7 +77,7 @@ ggplot(
 ##factors that are "upregulated"in IBD patients are shown in red, whereas "downregulated" factors are in blue. The vertical line indicates significance (i.e., adjusted p-valuesless than 0.05).
 
 ggplot(
-  associations_meIBD$summaries[associations_meIBD$summaries$term == "case_controlUC_I" ,],
+  associations_meIBD$summaries[associations_meIBD$summaries$term == "case_controlUC_NonI" ,],
   aes(-log10(adj_pvalue), reorder(component, -log10(adj_pvalue)), fill = estimate)
 ) +
   geom_point(pch = 21, size = 3) +
@@ -148,4 +149,18 @@ venn.diagram(
   fill = c("blue", "red"),
   output = TRUE  # Add this to ensure the diagram is saved to the file
 )
+
+# Count the number of genes in each module
+module_df <- data.frame(gene = names(module_assignment_IBD), module = module_assignment_IBD)
+module_df <- data.frame(module = module_df$gene, gene = module_df$module)
+# Use aggregate to count the number of genes per module
+module_counts <- aggregate(gene ~ module, data = module_df, FUN = length)
+
+# Find the largest and smallest modules
+largest_module <- module_counts[which.max(module_counts$gene), ]
+smallest_module <- module_counts[which.min(module_counts$gene), ]
+
+# Print the results
+cat("Largest module:", largest_module$module, "with size:", largest_module$gene, "\n")
+cat("Smallest module:", smallest_module$module, "with size:", smallest_module$gene, "\n")
 

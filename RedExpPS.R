@@ -81,6 +81,7 @@ levels(PS_me$sra_accession)
 
 
 associations_fePS$summaries[associations_fePS$summaries$term == "case_controlPS" ,]
+associations_mePS$summaries[associations_mePS$summaries$term == "case_controlPS" ,]
 
 ggplot(
   associations_fePS$summaries[associations_fePS$summaries$term == "case_controlPS" ,],
@@ -127,4 +128,18 @@ ggplot(
   geom_point(pch = 21, size = 3) +
   xlab("-log10(p-value)") +
   ylab("Pathway name (ordered by p-value)")
+
+
+
+module_df <- data.frame(module = names(module_assignment_PS), gene = module_assignment_PS)
+# Use aggregate to count the number of genes per module
+module_counts <- aggregate(gene ~ module, data = module_df, FUN = length)
+
+# Find the largest and smallest modules
+largest_module <- module_counts[which.max(module_counts$gene), ]
+smallest_module <- module_counts[which.min(module_counts$gene), ]
+
+# Print the results
+cat("Largest module:", largest_module$module, "with size:", largest_module$gene, "\n")
+cat("Smallest module:", smallest_module$module, "with size:", smallest_module$gene, "\n")
 
